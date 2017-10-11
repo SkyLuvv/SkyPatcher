@@ -14,7 +14,6 @@ BOOLEAN WINAPI  DllMain(HMODULE hModule,
 		//for better performance reasons
 	    DisableThreadLibraryCalls(hModule);
 
-
 		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Start::Start, 0, 0, 0 );
 	}
 	case DLL_THREAD_ATTACH:
