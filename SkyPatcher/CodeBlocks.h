@@ -4,60 +4,65 @@
 #include "MemoryClass.h"
 #include <iostream>
 
+
 //NOTE: need inline if defining in .h file. Header guards do not protect you from link-time multiple definitions
 
-//lets us ignores the null terminator for c-strings in the middle of our string so it gets the length from start to end
-//example usage : "\x80\x00\x30"s
-using namespace std::string_literals;
 
 class LocalChara
 {
 public:
-	uint32_t off_health = 0x134;
+	
+	LocalChara();
+	static void GrabBase();
+	void Patch(const std::vector<std::pair<int32_t, int32_t>> & ModuleAddresses);
+
+private:
+	static constexpr uint32_t off_health = 0x134;
 	uint32_t addr_base = 0;
 	uint32_t addr_func = 0;
 	uint32_t addr_return = 0;
-	std::string pttrn_charabase = "\x66\x8B\x81\xC4\x01\x00\x00"s;
-public:
-	static void GrabBase();
-	void Patch(const std::vector<std::pair<int32_t, int32_t>> & ModuleAddresses);
+	std::string pttrn_charabase;
+
 private:
 	bool Patch_GetBase(const std::vector<std::pair<int32_t,int32_t>> & ModuleAddresses);
 
 }; static LocalChara LChara;
 
-
-
 class ReviveBox
 {
+
 public:
+	ReviveBox();
+
+	static void GrabArg();
+	void Patch(const std::vector<std::pair<int32_t, int32_t>> & ModuleAddresses);
+	void CreateReviveBox();
+
+private:
     uint32_t arg_first = 0;
     uint32_t arg_second = 5;
     uint32_t *arg_third = nullptr;
 	void * pThis = *(void**)0x0344EB08;
 
-	uint32_t off_firstarg = 0x2748e78;
+	static constexpr uint32_t off_firstarg = 0x2748e78;
 
     uint32_t addr_rtn_funcgrabargs = 0;
 	uint32_t addr_rtn_funcstatictext = 0;
 	uint32_t addr_rtn_funcKUtext = 0;
 
-    uint32_t addr_funccreatewindow = 0x011BE4D0;
+    static constexpr uint32_t addr_funccreatewindow = 0x011BE4D0;
 	uint32_t addr_funcgrabargs = 0;
 	uint32_t addr_funcstatictext = 0;
 
 
-public:
-	std::string pttrn_funcgrabargs =  "\xFF\xD2\x83\xE8\x00\x0F\x84\x58\x01\x00\x00\x48\x0F"s ;
-	std::string pttrn_funcKUtext = "\x6A\x00\x8B\x4D\xBC\x6A"s;
-	std::string pttrn_funcstatictxtwindow = "\x6A\x00\x6A\x00\x6A\x00\x6A\x04\x68\xFF"s;
+	std::string pttrn_funcgrabargs;
+	std::string pttrn_funcKUtext;
+	std::string pttrn_funcstatictxtwindow;
 
-public:
-    typedef void(__thiscall * Func)(void* pThis, void* first, int32_t flag, void* third);
+	typedef void(__thiscall * Func)(void* pThis, void* first, int32_t flag, void* third);
 	Func CreateRezBox = (Func)addr_funccreatewindow;
-public:
-    static void GrabArg();
-	void Patch(const std::vector<std::pair<int32_t, int32_t>> & ModuleAddresses);
+
+
 private:
 
 	bool Patch_GetArg(const std::vector<std::pair<int32_t, int32_t>> & ModuleAddresses);
@@ -69,6 +74,15 @@ private:
 }; static ReviveBox RevBox;
 
 
+inline LocalChara::LocalChara()
+{
+	//lets us ignores the null terminator for c-strings in the middle of our string so it gets the length from start to end
+	//example usage : "\x80\x00\x30"s
+	using namespace std::string_literals;
+
+	pttrn_charabase = "\x66\x8B\x81\xC4\x01\x00\x00"s;
+
+}
 
 inline void __declspec(naked) LocalChara::GrabBase()
 {
@@ -107,8 +121,16 @@ inline bool LocalChara::Patch_GetBase(const std::vector<std::pair<int32_t, int32
 	return true;
 }
 
+inline ReviveBox::ReviveBox()
+{
+	using namespace std::string_literals;
+
+	pttrn_funcgrabargs = "\xFF\xD2\x83\xE8\x00\x0F\x84\x58\x01\x00\x00\x48\x0F"s;
+	pttrn_funcKUtext = "\x6A\x00\x8B\x4D\xBC\x6A"s;
+	pttrn_funcstatictxtwindow = "\x6A\x00\x6A\x00\x6A\x00\x6A\x04\x68\xFF"s;
 
 
+}
 
 inline void __declspec(naked) ReviveBox::GrabArg()
 {
@@ -138,6 +160,11 @@ inline void ReviveBox::Patch(const std::vector<std::pair<int32_t, int32_t>>& Mod
 		std::cout << "Patch Failed : Patch_GetArg" << std::endl;
 
 
+}
+
+inline void ReviveBox::CreateReviveBox()
+{
+	CreateRezBox(pThis, (void*)arg_first, arg_second, (void*)arg_third);
 }
 
 inline bool ReviveBox::Patch_GetArg(const std::vector<std::pair<int32_t, int32_t>>& ModuleAddresses)

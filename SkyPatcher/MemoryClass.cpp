@@ -18,7 +18,6 @@ int32_t Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& page
 
 			for (uint32_t x = 0; x < pattern.length(); ++x)
 			{
-
 				if (pattern[x] == '?')
 				{
 
