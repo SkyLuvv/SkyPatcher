@@ -11,12 +11,9 @@
 namespace Sky
 {
 
-
 	void main();
 
 	void CreateMyConsole();
-	
-	
 
 }
 

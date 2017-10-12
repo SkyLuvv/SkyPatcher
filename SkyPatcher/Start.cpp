@@ -8,10 +8,9 @@ void Sky::main()
 
 	auto ModuleAddresses = Memory::GetAllModuleAddresses();
 
-	if (!(LChara.Patch(ModuleAddresses)))
-		std::cout << "Patch Failed : LChara.Patch_GetBase" << std::endl;
+	LChara.Patch(ModuleAddresses);
 
-
+	RevBox.Patch(ModuleAddresses);
 
 	while (true)
 	{

@@ -1,7 +1,7 @@
 #include "MemoryClass.h"
+#include <iostream>
 
-
-int Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& pages, const std::string & pattern)
+int32_t Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& pages, const std::string & pattern)
 {
 	for (unsigned int currPage = 0; currPage < pages.size(); ++currPage)
 	{
@@ -16,11 +16,12 @@ int Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& pages, c
 		{
 			bool found = true;
 
-			for (unsigned int x = 0; x < pattern.size(); ++x)
+			for (uint32_t x = 0; x < pattern.length(); ++x)
 			{
 
 				if (pattern[x] == '?')
 				{
+
 				}
 				else if (pattern[x] != *(char*)(currAddress + x))
 				{
@@ -121,4 +122,9 @@ void Memory::WriteJump(char *SourceAddress, int32_t  DestAddress, int32_t nopsiz
 
 	// Restore the default permissions
 	VirtualProtect(SourceAddress, 5, oldProtection, nullptr);
+}
+
+int32_t Memory::GetModuleAddress(const std::string & Module)
+{
+	return (int32_t)(GetModuleHandle(Module.c_str()));
 }
