@@ -1,14 +1,22 @@
 #pragma once
+#include "CodeBlocks.h"
 #include "MemoryClass.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include "Windows.h"
+#include "CodeBlocks.h"
 
 
-namespace Start
+namespace Sky
 {
 
-	void Start();
+
+	void main();
+
 	void CreateMyConsole();
-	void Setup_ReviveBoxInf(const uint32_t & ModuleBase);
-	void Setup_LocalCharaInf(const uint32_t & ModuleBase);
+	
+	
 
 }
 

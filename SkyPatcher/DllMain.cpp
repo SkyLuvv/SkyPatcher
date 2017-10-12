@@ -1,7 +1,6 @@
 #include "Start.h"
 #include "Windows.h"
 
-
 BOOLEAN WINAPI  DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
@@ -14,7 +13,7 @@ BOOLEAN WINAPI  DllMain(HMODULE hModule,
 		//for better performance reasons
 	    DisableThreadLibraryCalls(hModule);
 
-		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Start::Start, 0, 0, 0 );
+		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Sky::main, 0, 0, 0 );
 	}
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:

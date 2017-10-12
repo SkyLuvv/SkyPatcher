@@ -1,16 +1,16 @@
 #include "MemoryClass.h"
-#include "Windows.h"
 
-int Memory::FindPattern(const std::vector<std::pair<int, int>>& pages, const std::string & pattern)
+
+int Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& pages, const std::string & pattern)
 {
 	for (unsigned int currPage = 0; currPage < pages.size(); ++currPage)
 	{
 		//.first is the start address of our page
-		int currAddress = pages[currPage].first;
+		auto currAddress = pages[currPage].first;
 
 		//the end of the page is the start address + the size of the page (.second) minues the length of our pattern
 		//since we don't want to scan  invalid memory
-		int EndofPage = (pages[currPage].first + pages[currPage].second) - pattern.length();
+		auto EndofPage = (int32_t)(pages[currPage].first + pages[currPage].second) - pattern.length();
 
 		for (; currAddress < EndofPage; ++currAddress)
 		{
@@ -35,7 +35,7 @@ int Memory::FindPattern(const std::vector<std::pair<int, int>>& pages, const std
 	return 0;
 }
 
-std::vector<std::pair<int, int>> Memory::GetAllModuleAddresses()
+std::vector<std::pair<int32_t, int32_t>> Memory::GetAllModuleAddresses()
 {
 	using namespace std;
 
@@ -44,21 +44,21 @@ std::vector<std::pair<int, int>> Memory::GetAllModuleAddresses()
 
 
 	//start with our module so that we don't begin with scanning heap/stack memory and such
-	int address = (int)GetModuleHandle(0);
+	auto address = (int32_t)GetModuleHandle(0);
 
 	//the protection flags we are going to look for in the page. if it's equal to one of these, don't 
 	//push it into our vector
-	int dwProtect = (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS);
+	int32_t dwProtect = (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS);
 
-	vector<pair<int, int> > pages;
+	vector<pair<int32_t, int32_t> > pages;
 
 
 	//iterate through the pages in memory and store the base and size in our std::pair
 	//if virtualquery returns 0 that means it can't scan the memory further, so break out
-	for (; VirtualQuery((int*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
+	for (; VirtualQuery((int32_t*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
 		//add the base addr of the page we are on with its size to get to the next
 		//page in memory, and store in address, so we can query for information on each page
-		address = (int)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
+		address = (int32_t)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
 
 
 	{
@@ -80,10 +80,10 @@ std::vector<std::pair<int, int>> Memory::GetAllModuleAddresses()
 	return pages;
 }
 
-void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress)
+void Memory::WriteJump(char *SourceAddress, int32_t  DestAddress, int32_t nopsize)
 {
 	DWORD oldProtection;
-	int relativeAddress;
+	int32_t relativeAddress;
 
 	
 	//give that address read and write permissions and store the old permissions at oldProtection
@@ -104,7 +104,11 @@ void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress)
 	//so it doesnt count the beginning of itself it counts away from itself, which is starting the next byte fd 
 
 	//relativeAddress is how far away from the SourceAddress we need to jump, to get to the destinationAddress
-	relativeAddress = (int)((int)DestAddress - (int)SourceAddress) - 5;
+	relativeAddress = (int32_t)(DestAddress - (int32_t)SourceAddress) - 5;
+
+	//nop the bytes first before writing our jump
+	for (uint32_t i = 0; i < nopsize; ++i)
+		*(SourceAddress + i) = 0x90;
 
 	// Write the JMP opcode at our jump position...
 	//takes up one byte
@@ -113,7 +117,7 @@ void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress)
 	// Write the offset to where we're gonna jump
 	//The instruction will then become JMP ff002123 for example
 	//dereference it as a 4 byte ptr, because the addresses take up 4 bytes
-	*((int*)(SourceAddress + 0x01)) = relativeAddress;
+	*((int32_t*)(SourceAddress + 0x01)) = relativeAddress;
 
 	// Restore the default permissions
 	VirtualProtect(SourceAddress, 5, oldProtection, nullptr);

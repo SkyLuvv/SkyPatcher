@@ -21,6 +21,9 @@
     <ClInclude Include="Start.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CodeBlocks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">

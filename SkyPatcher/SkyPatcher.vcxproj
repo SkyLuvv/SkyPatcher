@@ -118,6 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CodeBlocks.h" />
     <ClInclude Include="MemoryClass.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
