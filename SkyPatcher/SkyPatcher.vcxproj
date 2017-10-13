@@ -119,14 +119,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CodeBlocks.h" />
+    <ClInclude Include="LocalCharacter.h" />
     <ClInclude Include="MemoryClass.h" />
+    <ClInclude Include="ReviveBox.h" />
     <ClInclude Include="Start.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
+    <ClCompile Include="LocalCharacter.cpp" />
     <ClCompile Include="MemoryClass.cpp" />
+    <ClCompile Include="ReviveBox.cpp" />
     <ClCompile Include="Start.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\ASMBlocks.asm">
+      <CallingConvention Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">0</CallingConvention>
+      <UseSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</UseSafeExceptionHandlers>
+    </MASM>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -21,7 +21,10 @@
     <ClInclude Include="Start.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CodeBlocks.h">
+    <ClInclude Include="ReviveBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalCharacter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,5 +38,16 @@
     <ClCompile Include="MemoryClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LocalCharacter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReviveBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\ASMBlocks.asm">
+      <Filter>Header Files</Filter>
+    </MASM>
   </ItemGroup>
 </Project>

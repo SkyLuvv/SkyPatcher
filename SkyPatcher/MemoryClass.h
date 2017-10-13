@@ -8,8 +8,10 @@
 class Memory
 {
 public:
-	static int32_t FindPattern(const std::vector<std::pair<int32_t, int32_t>>&pages, const std::string & pattern);
-	static std::vector<std::pair<int32_t, int32_t>> GetAllModuleAddresses();
-	static void WriteJump(char *SourceAddress, int32_t  DestAddress, int32_t nopsize = 5);
-	static int32_t GetModuleAddress(const std::string & Module);
+	static uint32_t FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>&pages, const std::string & pattern);
+	static std::vector<std::pair<uint32_t, uint32_t>> GetAllModuleAddresses();
+	static void WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nopsize = 5);
+	static uint32_t GetModuleAddress(const std::string & Module);
+	static void Memory::WriteToMemory(char *membase, const std::string & bytes);
+	static void Memory::WriteNop(char *membase, const size_t & size);
 };

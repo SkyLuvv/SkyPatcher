@@ -1,9 +1,21 @@
 
 #include "Start.h"
+#include "LocalCharacter.h"
+#include "ReviveBox.h"
+
+LocalChara LChara;
+ReviveBox RevBox;
+
+extern "C"
+{
+	uint32_t obj_LCharaAddr = (uint32_t)&LChara;
+	uint32_t obj_RevBoxAddr = (uint32_t)&RevBox;
+}
 
 
 void Sky::main()
 {
+	
 	CreateMyConsole();
 
 	auto ModuleAddresses = Memory::GetAllModuleAddresses();

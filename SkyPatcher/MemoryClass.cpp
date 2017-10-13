@@ -1,7 +1,7 @@
 #include "MemoryClass.h"
 #include <iostream>
 
-int32_t Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& pages, const std::string & pattern)
+uint32_t Memory::FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>& pages, const std::string & pattern)
 {
 	for (unsigned int currPage = 0; currPage < pages.size(); ++currPage)
 	{
@@ -10,13 +10,13 @@ int32_t Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& page
 
 		//the end of the page is the start address + the size of the page (.second) minues the length of our pattern
 		//since we don't want to scan  invalid memory
-		auto EndofPage = (int32_t)(pages[currPage].first + pages[currPage].second) - pattern.length();
+		auto EndofPage = (uint32_t)(pages[currPage].first + pages[currPage].second) - pattern.length();
 
 		for (; currAddress < EndofPage; ++currAddress)
 		{
 			bool found = true;
 
-			for (uint32_t x = 0; x < pattern.length(); ++x)
+			for (size_t x = 0; x < pattern.length(); ++x)
 			{
 				if (pattern[x] == '?')
 				{
@@ -35,7 +35,7 @@ int32_t Memory::FindPattern(const std::vector<std::pair<int32_t, int32_t>>& page
 	return 0;
 }
 
-std::vector<std::pair<int32_t, int32_t>> Memory::GetAllModuleAddresses()
+std::vector<std::pair<uint32_t, uint32_t>> Memory::GetAllModuleAddresses()
 {
 	using namespace std;
 
@@ -44,21 +44,21 @@ std::vector<std::pair<int32_t, int32_t>> Memory::GetAllModuleAddresses()
 
 
 	//start with our module so that we don't begin with scanning heap/stack memory and such
-	auto address = (int32_t)GetModuleHandle(0);
+	auto address = (uint32_t)GetModuleHandle(0);
 
 	//the protection flags we are going to look for in the page. if it's equal to one of these, don't 
 	//push it into our vector
 	int32_t dwProtect = (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS);
 
-	vector<pair<int32_t, int32_t> > pages;
+	vector<pair<uint32_t, uint32_t> > pages;
 
 
 	//iterate through the pages in memory and store the base and size in our std::pair
 	//if virtualquery returns 0 that means it can't scan the memory further, so break out
-	for (; VirtualQuery((int32_t*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
+	for (; VirtualQuery((uint32_t*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
 		//add the base addr of the page we are on with its size to get to the next
 		//page in memory, and store in address, so we can query for information on each page
-		address = (int32_t)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
+		address = (uint32_t)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
 
 
 	{
@@ -80,7 +80,7 @@ std::vector<std::pair<int32_t, int32_t>> Memory::GetAllModuleAddresses()
 	return pages;
 }
 
-void Memory::WriteJump(char *SourceAddress, int32_t  DestAddress, int32_t nopsize)
+void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nopsize)
 {
 	DWORD oldProtection;
 	int32_t relativeAddress;
@@ -104,10 +104,10 @@ void Memory::WriteJump(char *SourceAddress, int32_t  DestAddress, int32_t nopsiz
 	//so it doesnt count the beginning of itself it counts away from itself, which is starting the next byte fd 
 
 	//relativeAddress is how far away from the SourceAddress we need to jump, to get to the destinationAddress
-	relativeAddress = (int32_t)(DestAddress - (int32_t)SourceAddress) - 5;
+	relativeAddress = (uint32_t)(DestAddress - (uint32_t)SourceAddress) - 5;
 
 	//nop the bytes first before writing our jump
-	for (uint32_t i = 0; i < nopsize; ++i)
+	for (size_t i = 0; i < nopsize; ++i)
 		*(SourceAddress + i) = 0x90;
 
 	// Write the JMP opcode at our jump position...
@@ -117,13 +117,43 @@ void Memory::WriteJump(char *SourceAddress, int32_t  DestAddress, int32_t nopsiz
 	// Write the offset to where we're gonna jump
 	//The instruction will then become JMP ff002123 for example
 	//dereference it as a 4 byte ptr, because the addresses take up 4 bytes
-	*((int32_t*)(SourceAddress + 0x01)) = relativeAddress;
+	*((uint32_t*)(SourceAddress + 0x01)) = relativeAddress;
 
 	// Restore the default permissions
 	VirtualProtect(SourceAddress, 5, oldProtection, nullptr);
 }
 
-int32_t Memory::GetModuleAddress(const std::string & Module)
+uint32_t Memory::GetModuleAddress(const std::string & Module)
 {
-	return (int32_t)(GetModuleHandle(Module.c_str()));
+	return (uint32_t)(GetModuleHandle(Module.c_str()));
+}
+
+void Memory::WriteToMemory(char *membase, const std::string & bytes)
+{
+	DWORD oldProtection;
+	//give that address read and write permissions and store the old permissions at oldProtection
+	VirtualProtect(membase, bytes.length(), PAGE_EXECUTE_READWRITE, &oldProtection);
+
+	for (size_t i = 0; i < bytes.length(); ++i)
+	{
+		*(membase + i) = bytes[i];
+	}
+
+	// Restore the default permissions
+	VirtualProtect(membase, bytes.length(), oldProtection, nullptr);
+}
+
+void Memory::WriteNop(char * membase, const size_t & size)
+{
+	DWORD oldProtection;
+	//give that address read and write permissions and store the old permissions at oldProtection
+	VirtualProtect(membase, size , PAGE_EXECUTE_READWRITE, &oldProtection);
+
+	for (size_t i = 0; i < size ; ++i)
+	{
+		*(membase + i) = 0x90;
+	}
+
+	// Restore the default permissions
+	VirtualProtect(membase, size, oldProtection, nullptr);
 }
