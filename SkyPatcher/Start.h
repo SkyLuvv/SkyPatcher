@@ -4,16 +4,14 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
-#include "Windows.h"
+#include "Winsock.h"
 
 
 
 namespace Sky
 {
-
 	void main();
-
 	void CreateMyConsole();
-
+	void CreateConnection();
 }
 

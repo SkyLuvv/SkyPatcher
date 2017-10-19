@@ -16,6 +16,22 @@ void LocalChara::Patch(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleA
 		std::cout << "Patched Failed : Patch_GetBase" << std::endl;
 }
 
+float LocalChara::GetHealth()const
+{
+	if (!addr_base)
+		return 1.0f;
+
+	return *(float*)(addr_base + off_health);
+}
+
+void LocalChara::SetHealth(float newHealth)
+{
+	if (!addr_base)
+		return;
+
+	*(float*)(addr_base + off_health) = newHealth;
+}
+
 bool LocalChara::Patch_GetBase(const std::vector<std::pair<uint32_t, uint32_t>>  & ModuleAddresses)
 {
 	addr_func = Memory::FindPattern(ModuleAddresses, pttrn_charabase);
@@ -25,7 +41,7 @@ bool LocalChara::Patch_GetBase(const std::vector<std::pair<uint32_t, uint32_t>> 
 
 	addr_return = addr_func + 0x07;
 
-	Memory::WriteJump((char*)addr_func, (uint32_t)LCharaGrabBase, 7);
+	Memory::WriteJump((char*)addr_func, (uint32_t)LChara_GrabBase, 7);
 
 	return true;
 }

@@ -2,7 +2,7 @@
 #include <vector>
 #include <map>
 #include <stdint.h>
-#include "Windows.h"
+#include "WindowsIncludes.h"
 
 
 class Memory
@@ -12,6 +12,6 @@ public:
 	static std::vector<std::pair<uint32_t, uint32_t>> GetAllModuleAddresses();
 	static void WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nopsize = 5);
 	static uint32_t GetModuleAddress(const std::string & Module);
-	static void Memory::WriteToMemory(char *membase, const std::string & bytes);
-	static void Memory::WriteNop(char *membase, const size_t & size);
+	static void WriteToMemory(char *membase, const std::string & bytes);
+	static void WriteNop(char *membase, const size_t & size);
 };

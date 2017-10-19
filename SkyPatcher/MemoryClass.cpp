@@ -3,7 +3,7 @@
 
 uint32_t Memory::FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>& pages, const std::string & pattern)
 {
-	for (unsigned int currPage = 0; currPage < pages.size(); ++currPage)
+	for (size_t currPage = 0; currPage < pages.size(); ++currPage)
 	{
 		//.first is the start address of our page
 		auto currAddress = pages[currPage].first;
@@ -20,7 +20,6 @@ uint32_t Memory::FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>& p
 			{
 				if (pattern[x] == '?')
 				{
-
 				}
 				else if (pattern[x] != *(char*)(currAddress + x))
 				{
@@ -42,41 +41,24 @@ std::vector<std::pair<uint32_t, uint32_t>> Memory::GetAllModuleAddresses()
 	//this struct will hold the information of the memory pages we are going to scan
 	MEMORY_BASIC_INFORMATION MemoryBasicInf;
 
-
 	//start with our module so that we don't begin with scanning heap/stack memory and such
 	auto address = (uint32_t)GetModuleHandle(0);
 
-	//the protection flags we are going to look for in the page. if it's equal to one of these, don't 
-	//push it into our vector
 	int32_t dwProtect = (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS);
 
 	vector<pair<uint32_t, uint32_t> > pages;
 
-
-	//iterate through the pages in memory and store the base and size in our std::pair
-	//if virtualquery returns 0 that means it can't scan the memory further, so break out
 	for (; VirtualQuery((uint32_t*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
-		//add the base addr of the page we are on with its size to get to the next
-		//page in memory, and store in address, so we can query for information on each page
 		address = (uint32_t)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
-
-
 	{
-
-		//Check if the memory is commited, not reserved/free.
-		//check the access protections of the page (Protect) and whether it's an image (mbi.Type)
-		//which means it should be a module
 		if ((MemoryBasicInf.State & MEM_COMMIT)
 			&& !(MemoryBasicInf.Protect & dwProtect)
 			&& (MemoryBasicInf.Type & MEM_IMAGE))
 		{
 			//store the base address and the size of the page
 			pages.push_back(make_pair(address, MemoryBasicInf.RegionSize));
-
 		}
-
 	}
-
 	return pages;
 }
 
@@ -131,7 +113,7 @@ uint32_t Memory::GetModuleAddress(const std::string & Module)
 void Memory::WriteToMemory(char *membase, const std::string & bytes)
 {
 	DWORD oldProtection;
-	//give that address read and write permissions and store the old permissions at oldProtection
+
 	VirtualProtect(membase, bytes.length(), PAGE_EXECUTE_READWRITE, &oldProtection);
 
 	for (size_t i = 0; i < bytes.length(); ++i)
@@ -139,7 +121,6 @@ void Memory::WriteToMemory(char *membase, const std::string & bytes)
 		*(membase + i) = bytes[i];
 	}
 
-	// Restore the default permissions
 	VirtualProtect(membase, bytes.length(), oldProtection, nullptr);
 }
 

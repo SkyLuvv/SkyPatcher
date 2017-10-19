@@ -11,7 +11,7 @@
 //and adds more complexity to code https://stackoverflow.com/questions/1041866/in-c-source-what-is-the-effect-of-extern-c
 extern  "C"
 {
-	void LCharaGrabBase();
+	void LChara_GrabBase();
 }
 
 class LocalChara
@@ -29,6 +29,8 @@ public:
 
 	LocalChara();
 	void Patch(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
+	float GetHealth()const;
+	void SetHealth(float newHealth);
 
 private:
 	bool Patch_GetBase(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);

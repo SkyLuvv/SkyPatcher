@@ -5,24 +5,30 @@
 {
 	using namespace std::string_literals;
 
-	pttrn_funcgrabargs = "\xFF\xD2\x83\xE8\x00\x0F\x84\x58\x01\x00\x00\x48\x0F"s;
-	pttrn_funcKUtext = "\x6A\x00\x8B\x4D\xBC\x6A"s;
-	pttrn_funcstatictxtwindow = "\x6A\x00\x6A\x00\x6A\x00\x6A\x04\x68\xFF"s;
-	pttrn_funcbypasstest = "\xE8\x05\x1C\x1B\xFF\x85\xC0\x0F\x84\x57\x4A\x00\x00"s;
-	pttrn_funcrtnmenuoption = "\x50\xE8\x0C\x99\x48\xFF"s;
 
+	pttrn_KUtext = "\x6A\x00\x8B\x4D\xBC\x6A"s;
 
-	pttrn_patch_funcrtnmenuoptn = "\xB8\x13\x00\x00\x00"s;
+	pttrn_statictxtwindow = "\x6A\x00\x6A\x00\x6A\x00\x6A\x04\x68\xFF"s;
+
+	pttrn_bypasstest = "\xE8\x05\x1C\x1B\xFF\x85\xC0\x0F\x84\x57\x4A\x00\x00"s;
+
+	pttrn_rtnmenuoption = "\x50\xE8\x0C\x99\x48\xFF"s;
+	
+	pttrn_position = "\xD1\xFB\x83\xC7\x50"s;
+
+	pttrn_dimandtransl = "\xE4\x6A\x04\x6A\x28\x68\xC8\x00\x00\x00"s;
+
+	pttrn_patch_rtnmenuoptn = "\xB8\x13\x00\x00\x00"s;
+	
+	//initialize the first argument.
+	auto ClientBase = Memory::GetModuleAddress("Client.exe");
+	arg_first = ClientBase + off_firstarg;
 }
-
 
  void ReviveBox::Patch(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
 {
 	 using namespace std;
-
-	if (!(Patch_GetArg(ModuleAddresses)))
-		cout << "Patch Failed : Patch_GetArg" << endl;
-
+	 
 	if (!(Patch_ByPassTest(ModuleAddresses)))
 		cout << "Patch Failed : Patch_ByPassTest" << endl;
 
@@ -35,38 +41,23 @@
 	if (!(Patch_KUtext(ModuleAddresses)))
 		cout << "Patch Failed : Patch_KUtext" << endl;
 
+	if (!Patch_position(ModuleAddresses))
+		cout << "Patch Failed : Patch_position" << endl;
 
+	if (!Patch_DimAndTransl(ModuleAddresses))
+	    cout << "Patch Failed : Patch_DimandTransl" << endl;
+	
 }
 
  void ReviveBox::CreateReviveBox()
 {
-	CreateRezBox(pThis, (uint32_t*)arg_first, arg_second, arg_third);
-}
-
- bool ReviveBox::Patch_GetArg(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
-{
-	auto addr = Memory::FindPattern(ModuleAddresses, pttrn_funcgrabargs);
-
-	if (!addr)
-		return false;
-
-	addr_rtn_funcgrabargs = addr + 0x05;
-
-	auto ClientBase = Memory::GetModuleAddress("Client.exe");
-
-	if (!ClientBase)
-		return false;
-
-	arg_first = ClientBase + off_firstarg;
-
-	Memory::WriteJump((char*)addr, (uint32_t)GrabThirdArg);
-
-	return true;
+	 if(arg_first)
+	  CreateRezBox(pThis, (uint32_t*)arg_first, arg_second, arg_third);
 }
 
  bool ReviveBox::Patch_ByPassTest(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_funcbypasstest);
+	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_bypasstest);
 
 	 if (!addr)
 		 return false;
@@ -78,21 +69,21 @@
 
  bool ReviveBox::Patch_ReturnRezMenuOption(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_funcrtnmenuoption);
+	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_rtnmenuoption);
 
 	 if (!addr)
 		 return false;
 
 	 Memory::WriteNop((char*)addr, 6);
 	
-	 Memory::WriteToMemory((char*)addr, pttrn_patch_funcrtnmenuoptn);
+	 Memory::WriteToMemory((char*)addr, pttrn_patch_rtnmenuoptn);
 	
 	return true;
 }
 
  bool ReviveBox::Patch_KUtext(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_funcKUtext);
+	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_KUtext);
 
 	 if (!addr)
 		 return false;
@@ -104,7 +95,7 @@
 
  bool ReviveBox::Patch_statictxtwindow(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_funcstatictxtwindow);
+	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_statictxtwindow);
 
 	 if (!addr)
 		 return false;
@@ -113,4 +104,39 @@
 
 	return true;
 }
+
+ bool ReviveBox::Patch_position(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ {
+	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_position);
+
+	 if (!addr)
+		 return false;
+
+	 addr_rtn_position = addr + 5;
+
+	 Memory::WriteNop((char*)addr, 5);
+
+	 Memory::WriteJump((char*)addr, (uint32_t)ReviveBox_Pos);
+
+	 return true;
+ }
+
+ bool ReviveBox::Patch_DimAndTransl(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ {
+	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_dimandtransl);
+
+	 if (!addr)
+		 return false;
+
+	 //increase once since its a memory address before where we need to patch
+	 ++addr;
+
+	 addr_rtn_dimandtransl = addr + 9;
+
+	 Memory::WriteNop((char*)addr, 9);
+
+	 Memory::WriteJump((char*)addr, (uint32_t)ReviveBox_DimAndTransl);
+
+	 return true;
+ }
 
