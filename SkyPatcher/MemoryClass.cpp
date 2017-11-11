@@ -1,16 +1,18 @@
 #include "MemoryClass.h"
 #include <iostream>
 
-uint32_t Memory::FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>& pages, const std::string & pattern)
+std::optional<uintptr_t> Memory::ScanAllPages(const std::vector<std::pair<uintptr_t, size_t>>& pages, const std::string & pattern)
 {
-	for (size_t currPage = 0; currPage < pages.size(); ++currPage)
+	
+	for (auto currPage = pages.begin(); currPage != pages.end(); std::advance(currPage,1))
 	{
+
 		//.first is the start address of our page
-		auto currAddress = pages[currPage].first;
+		auto currAddress = (size_t)currPage->first;
 
 		//the end of the page is the start address + the size of the page (.second) minues the length of our pattern
 		//since we don't want to scan  invalid memory
-		auto EndofPage = (uint32_t)(pages[currPage].first + pages[currPage].second) - pattern.length();
+		auto EndofPage = (size_t)(currPage->first + currPage->second) - pattern.length();
 
 		for (; currAddress < EndofPage; ++currAddress)
 		{
@@ -21,7 +23,7 @@ uint32_t Memory::FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>& p
 				if (pattern[x] == '?')
 				{
 				}
-				else if (pattern[x] != *(char*)(currAddress + x))
+				else if ((uint8_t)pattern[x] != *(uint8_t*)(currAddress + x))
 				{
 					found = false; break;
 				}
@@ -31,10 +33,42 @@ uint32_t Memory::FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>& p
 				return currAddress;
 		}
 	}
-	return 0;
+	return {};
 }
 
-std::vector<std::pair<uint32_t, uint32_t>> Memory::GetAllModuleAddresses()
+std::optional<uintptr_t> Memory::ScanModule(const std::pair<uintptr_t, size_t>& page, const std::string & pattern)
+{
+
+	auto currAddress = (size_t)page.first;
+	auto EndofPage = (size_t)(page.first + page.second) - pattern.length();
+
+	for (; currAddress < EndofPage; ++currAddress)
+	{
+		bool found = true;
+
+
+		if (IsBadReadPtr((void*)currAddress, pattern.length()) != 0)
+			continue;
+
+		for (size_t x = 0; x < pattern.length(); ++x)
+		{
+			if (pattern[x] == '?')
+			{
+			}
+			else if ((uint8_t)pattern[x] != *(uint8_t*)(currAddress + x))
+			{
+				found = false; break;
+			}
+
+		}
+		if (found)
+			return currAddress;
+	}
+
+	return {};
+}
+
+std::optional<std::vector<std::pair<uintptr_t, size_t>>> Memory::GetPageAddressesAndSize()
 {
 	using namespace std;
 
@@ -42,35 +76,67 @@ std::vector<std::pair<uint32_t, uint32_t>> Memory::GetAllModuleAddresses()
 	MEMORY_BASIC_INFORMATION MemoryBasicInf;
 
 	//start with our module so that we don't begin with scanning heap/stack memory and such
-	auto address = (uint32_t)GetModuleHandle(0);
+	auto address = (uintptr_t)GetModuleHandle(0);
 
 	int32_t dwProtect = (PAGE_GUARD | PAGE_NOCACHE | PAGE_NOACCESS);
 
-	vector<pair<uint32_t, uint32_t> > pages;
+	vector<pair<uintptr_t, size_t> > pages;
 
-	for (; VirtualQuery((uint32_t*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
-		address = (uint32_t)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
+	for (; VirtualQuery((uintptr_t*)address, &MemoryBasicInf, sizeof(MemoryBasicInf));
+		address = (uintptr_t)(MemoryBasicInf.BaseAddress) + MemoryBasicInf.RegionSize)
 	{
 		if ((MemoryBasicInf.State & MEM_COMMIT)
 			&& !(MemoryBasicInf.Protect & dwProtect)
 			&& (MemoryBasicInf.Type & MEM_IMAGE))
 		{
 			//store the base address and the size of the page
-			pages.push_back(make_pair(address, MemoryBasicInf.RegionSize));
+			pages.emplace_back(address, MemoryBasicInf.RegionSize);
 		}
 	}
+
+
+	if (pages.empty())
+		return {};
+
 	return pages;
+
 }
 
-void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nopsize)
+std::optional<MODULEINFO> Memory::GetModuleInfo(const std::string & ModuleName)
+{
+	MODULEINFO modinfo = { 0 };
+	HMODULE hModule = (HMODULE)GetModuleAddress(ModuleName).value_or(0);
+
+	if (!hModule) 
+		return {};
+
+	if (GetModuleInformation(GetCurrentProcess(), hModule, &modinfo, sizeof(MODULEINFO)))
+		return modinfo;
+	else
+		return {};
+
+}
+
+std::optional<std::pair<uintptr_t, size_t>> Memory::GetModuleAddressAndSize(const std::string & ModuleName)
+{
+	auto ModuleInfo = GetModuleInfo(ModuleName);
+
+	if (ModuleInfo)
+		return std::make_pair((uintptr_t)ModuleInfo.value().lpBaseOfDll, (size_t)ModuleInfo.value().SizeOfImage);
+	else
+		return {};
+
+}
+
+void Memory::WriteJump(uint8_t *SourceAddress, uintptr_t  DestAddress, size_t nopsize)
 {
 	DWORD oldProtection;
-	int32_t relativeAddress;
+	uintptr_t relativeAddress;
 
 	
 	//give that address read and write permissions and store the old permissions at oldProtection
 	//pass in 5 because a jump only modifies 5 bytes
-	VirtualProtect(SourceAddress, 5, PAGE_EXECUTE_READWRITE, &oldProtection);
+	VirtualProtect(SourceAddress, nopsize, PAGE_EXECUTE_READWRITE, &oldProtection);
 
 	//Calculate the "distance" we're gonna have to jump - the size of the JMP instruction
 	//The offset is relative to the end of the JMP instruction and not the beginning so we have to subtract 5 from it
@@ -86,7 +152,7 @@ void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nops
 	//so it doesnt count the beginning of itself it counts away from itself, which is starting the next byte fd 
 
 	//relativeAddress is how far away from the SourceAddress we need to jump, to get to the destinationAddress
-	relativeAddress = (uint32_t)(DestAddress - (uint32_t)SourceAddress) - 5;
+	relativeAddress = (uintptr_t)(DestAddress - (uintptr_t)SourceAddress) - 5;
 
 	//nop the bytes first before writing our jump
 	for (size_t i = 0; i < nopsize; ++i)
@@ -102,15 +168,20 @@ void Memory::WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nops
 	*((uint32_t*)(SourceAddress + 0x01)) = relativeAddress;
 
 	// Restore the default permissions
-	VirtualProtect(SourceAddress, 5, oldProtection, nullptr);
+	VirtualProtect(SourceAddress, nopsize, oldProtection, nullptr);
 }
 
-uint32_t Memory::GetModuleAddress(const std::string & Module)
+std::optional<uintptr_t> Memory::GetModuleAddress(const std::string & Module)
 {
-	return (uint32_t)(GetModuleHandle(Module.c_str()));
+	auto address = (uintptr_t)(GetModuleHandle(Module.c_str()));
+
+	if (address)
+		return address;
+
+	return {};
 }
 
-void Memory::WriteToMemory(char *membase, const std::string & bytes)
+void Memory::WriteBytes(uint8_t *membase, const std::string & bytes)
 {
 	DWORD oldProtection;
 
@@ -124,7 +195,7 @@ void Memory::WriteToMemory(char *membase, const std::string & bytes)
 	VirtualProtect(membase, bytes.length(), oldProtection, nullptr);
 }
 
-void Memory::WriteNop(char * membase, const size_t & size)
+void Memory::WriteByte(uint8_t * membase, const size_t & size, const unsigned char byte)
 {
 	DWORD oldProtection;
 	//give that address read and write permissions and store the old permissions at oldProtection
@@ -132,9 +203,11 @@ void Memory::WriteNop(char * membase, const size_t & size)
 
 	for (size_t i = 0; i < size ; ++i)
 	{
-		*(membase + i) = 0x90;
+		*(membase + i) = byte;
 	}
 
 	// Restore the default permissions
 	VirtualProtect(membase, size, oldProtection, nullptr);
 }
+
+

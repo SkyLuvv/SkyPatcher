@@ -2,24 +2,26 @@
 #include "MemoryClass.h"
 #include <stdint.h>
 #include <string>
+#include "Pattern.h"
+#include "Mod.h"
 
 extern "C"
 {
 	void Mod_DeadLock();
 }
 
-class DeadLock
+class DeadLock : public Mod
 {
 private:
 	uint32_t addr_return = 0;
-	std::string pttrn_condition;
+	Pattern condition;
 	
 public:
 	DeadLock();
-	void Patch(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses);
-
+	virtual void Patch() override;
+	virtual void UndoPatches() override;
 private:
 //patch to change the condition of whether enemies are alive or not
-	bool Patch_ChangeCondition(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses);
+	bool Patch_ChangeCondition();
 
 };

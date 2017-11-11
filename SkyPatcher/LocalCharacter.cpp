@@ -1,19 +1,31 @@
 #include "LocalCharacter.h"
 
+using namespace std::string_literals;
+
 LocalChara::LocalChara()
+	:
+	charabase("Client.exe", "D9 86 D0 02 00 00 D9 45 FC DE D9"s)
 {
 	//lets us ignores the null terminator for c-strings in the middle of our string so it gets the length from start to end
 	//example usage : "\x80\x00\x30"s
-	using namespace std::string_literals;
-
-	pttrn_charabase = "\x66\x8B\x81\xC4\x01\x00\x00"s;
 
 }
 
-void LocalChara::Patch(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+uintptr_t LocalChara::GetBase() const
 {
-	if (!(Patch_GetBase(ModuleAddresses)))
-		std::cout << "Patched Failed : Patch_GetBase" << std::endl;
+	return addr_base;
+}
+
+void LocalChara::Patch()
+{
+
+	if (!(Patch_GetBase()))
+		std::cout << "Patched Failed: LocalChara_GetBase" << std::endl;
+}
+
+void LocalChara::UndoPatches()
+{
+	charabase.UndoPatch();
 }
 
 float LocalChara::GetHealth()const
@@ -32,16 +44,15 @@ void LocalChara::SetHealth(float newHealth)
 	*(float*)(addr_base + off_health) = newHealth;
 }
 
-bool LocalChara::Patch_GetBase(const std::vector<std::pair<uint32_t, uint32_t>>  & ModuleAddresses)
+bool LocalChara::Patch_GetBase()
 {
-	addr_func = Memory::FindPattern(ModuleAddresses, pttrn_charabase);
 
-	if (!addr_func)
+	if (charabase.GetAddress())
+		addr_return = charabase.GetAddress().value() + 6;
+	else
 		return false;
 
-	addr_return = addr_func + 0x07;
-
-	Memory::WriteJump((char*)addr_func, (uint32_t)LChara_GrabBase, 7);
+	charabase.WriteJump((uintptr_t)LChara_GrabBase, 6);
 
 	return true;
 }

@@ -3,7 +3,8 @@
 #include <string>
 #include "MemoryClass.h"
 #include <iostream>
-
+#include "Pattern.h"
+#include "Mod.h"
 
 //NOTE: need inline if defining in .h file. Header guards do not protect you from link-time multiple definitions
 
@@ -14,7 +15,7 @@ extern  "C"
 	void LChara_GrabBase();
 }
 
-class LocalChara
+class LocalChara : public Mod
 {
 private:
 
@@ -22,17 +23,19 @@ private:
 	uint32_t addr_base = 0;
 	uint32_t addr_return = 0;
 	uint32_t addr_func = 0;
-	std::string pttrn_charabase;
-	static constexpr uint32_t off_health = 0x134;
+	Pattern charabase;
+	static constexpr uint32_t off_health = 0x1A8;
 
 public:
 
 	LocalChara();
-	void Patch(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
+	uintptr_t GetBase()const;
+	virtual void Patch() override;
+	virtual void UndoPatches() override;
 	float GetHealth()const;
 	void SetHealth(float newHealth);
 
 private:
-	bool Patch_GetBase(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
+	bool Patch_GetBase();
 
 };

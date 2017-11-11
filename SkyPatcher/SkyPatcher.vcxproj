@@ -99,6 +99,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions> /std:c++latest %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -121,12 +122,17 @@
   <ItemGroup>
     <ClInclude Include="DirectInputDefines.h" />
     <ClInclude Include="AutoInput.h" />
+    <ClInclude Include="Enumeration.h" />
     <ClInclude Include="FrameTimer.h" />
+    <ClInclude Include="Interface.h" />
     <ClInclude Include="LocalCharacter.h" />
     <ClInclude Include="MemoryClass.h" />
-    <ClInclude Include="Mods.h" />
+    <ClInclude Include="DeadLock.h" />
+    <ClInclude Include="Mod.h" />
+    <ClInclude Include="Pattern.h" />
     <ClInclude Include="ReviveBox.h" />
     <ClInclude Include="Start.h" />
+    <ClInclude Include="MyWindow.h" />
     <ClInclude Include="WindowsIncludes.h" />
     <ClInclude Include="Winsock.h" />
   </ItemGroup>
@@ -134,9 +140,12 @@
     <ClCompile Include="AutoInput.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="FrameTimer.cpp" />
+    <ClCompile Include="Interface.cpp" />
     <ClCompile Include="LocalCharacter.cpp" />
     <ClCompile Include="MemoryClass.cpp" />
-    <ClCompile Include="Mods.cpp" />
+    <ClCompile Include="DeadLock.cpp" />
+    <ClCompile Include="MyWindow.cpp" />
+    <ClCompile Include="Pattern.cpp" />
     <ClCompile Include="ReviveBox.cpp" />
     <ClCompile Include="Start.cpp" />
     <ClCompile Include="Winsock.cpp" />

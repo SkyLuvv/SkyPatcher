@@ -3,14 +3,15 @@
 #include <string>
 #include "MemoryClass.h"
 #include <iostream>
-
+#include "Pattern.h"
+#include "Mod.h"
 extern "C"
 {
 	void ReviveBox_Pos();
 	void ReviveBox_DimAndTransl();
 }
 
-class ReviveBox
+class ReviveBox : public Mod
 {
 private:
 	//keep in mind everything is organized specifically because we access the members by offsets in our assembly code
@@ -34,21 +35,18 @@ private:
 	uint32_t arg_first = 0;
 	int32_t arg_second = 1;
 	uint32_t *arg_third = nullptr;
-	void * pThis = *(void**)0x0344EB08;
-	static constexpr uint32_t off_firstarg = 0x2748e78;
-	static constexpr uint32_t addr_funccreatewindow = 0x011BE4D0;
+	void * pThis = *(void**)0x0355DEF8;
+	static constexpr uint32_t off_firstarg = 0x28186C8;
+	static constexpr uint32_t addr_funccreatewindow = 0x012488D0;
 
-private:
-
-	std::string pttrn_KUtext;
-	std::string pttrn_statictxtwindow;
-	std::string pttrn_bypasstest;
-	std::string pttrn_rtnmenuoption;
-	std::string pttrn_position;
-	std::string pttrn_dimandtransl;
 	
-
 	std::string pttrn_patch_rtnmenuoptn;
+	Pattern kutext;
+	Pattern bypasstest;
+	Pattern statictxt;
+	Pattern dimandtransl;
+	Pattern position;
+	Pattern rtnoption;
 
 private:
 
@@ -56,17 +54,17 @@ private:
 	Func CreateRezBox = (Func)addr_funccreatewindow;
 
 private:
-
-	bool Patch_ByPassTest(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
-	bool Patch_ReturnRezMenuOption(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
-	bool Patch_KUtext(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
-	bool Patch_statictxtwindow(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
-	bool Patch_position(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
-	bool Patch_DimAndTransl(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
+	bool Patch_ByPassTest();
+	bool Patch_ReturnRezMenuOption();
+	bool Patch_KUtext();
+	bool Patch_statictxtwindow();
+	bool Patch_position();
+	bool Patch_DimAndTransl();
 
 public:
 	ReviveBox();
-	void Patch(const std::vector<std::pair<uint32_t, uint32_t>> & ModuleAddresses);
+	virtual void Patch() override;
+	virtual void UndoPatches() override;
 	void CreateReviveBox();
 };
 

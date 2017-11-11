@@ -1,53 +1,62 @@
 #pragma once
 #include "ReviveBox.h"
 
+using namespace std::string_literals;
+
  ReviveBox::ReviveBox()
+	 :
+ kutext("Client.exe", "6A 00 8B 4D BC 6A"s),
+ bypasstest("Client.exe", "E8 95 72 12 FF"s),
+ statictxt("Client.exe", "6A 00 6A 00 6A 00 6A 04 68 FF"s),
+ rtnoption("Client.exe", "50 E8 0C 00 41 FF"s),
+ dimandtransl("Client.exe", "E4 6A 04 6A 28 68 C8 00 00 00"s),
+ position("Client.exe", "D1 FB 83 C7 50"s)
 {
-	using namespace std::string_literals;
-
-
-	pttrn_KUtext = "\x6A\x00\x8B\x4D\xBC\x6A"s;
-
-	pttrn_statictxtwindow = "\x6A\x00\x6A\x00\x6A\x00\x6A\x04\x68\xFF"s;
-
-	pttrn_bypasstest = "\xE8\x05\x1C\x1B\xFF\x85\xC0\x0F\x84\x57\x4A\x00\x00"s;
-
-	pttrn_rtnmenuoption = "\x50\xE8\x0C\x99\x48\xFF"s;
+	pttrn_patch_rtnmenuoptn = "B8 13 00 00 00"s;
 	
-	pttrn_position = "\xD1\xFB\x83\xC7\x50"s;
+	//increase once since its a memory address before where we need to patch
+	if(dimandtransl.GetAddress())
+	  dimandtransl.SetAddress(dimandtransl.GetAddress().value() + 1);
 
-	pttrn_dimandtransl = "\xE4\x6A\x04\x6A\x28\x68\xC8\x00\x00\x00"s;
-
-	pttrn_patch_rtnmenuoptn = "\xB8\x13\x00\x00\x00"s;
-	
 	//initialize the first argument.
-	auto ClientBase = Memory::GetModuleAddress("Client.exe");
+	auto ClientBase = Memory::GetModuleAddress("Client.exe").value_or(0);
 	arg_first = ClientBase + off_firstarg;
 }
-
- void ReviveBox::Patch(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ 
+ void ReviveBox::Patch()
 {
 	 using namespace std;
 	 
-	if (!(Patch_ByPassTest(ModuleAddresses)))
-		cout << "Patch Failed : Patch_ByPassTest" << endl;
-
-	if (!(Patch_ReturnRezMenuOption(ModuleAddresses)))
-		cout << "Patch Failed : Patch_ReturnRezMenuOption" << endl;
-
-	if (!(Patch_statictxtwindow(ModuleAddresses)))
-		cout << "Patch Failed : Patch_statictxtwindow" << endl;
-
-	if (!(Patch_KUtext(ModuleAddresses)))
-		cout << "Patch Failed : Patch_KUtext" << endl;
-
-	if (!Patch_position(ModuleAddresses))
-		cout << "Patch Failed : Patch_position" << endl;
-
-	if (!Patch_DimAndTransl(ModuleAddresses))
-	    cout << "Patch Failed : Patch_DimandTransl" << endl;
+	if (!(Patch_ReturnRezMenuOption()))
+		cout << "Patch Failed : ReviveBox_ReturnRezMenuOption" << endl;
 	
+	if (!(Patch_statictxtwindow()))
+		cout << "Patch Failed : ReviveBox_statictxtwindow" << endl;
+
+	if (!(Patch_KUtext()))
+		cout << "Patch Failed : ReviveBox_KUtext" << endl;
+
+	if (!Patch_position())
+		cout << "Patch Failed : ReviveBox_position" << endl;
+
+	if (!Patch_DimAndTransl())
+	    cout << "Patch Failed : ReviveBox_DimandTransl" << endl;
+	
+	if (!(Patch_ByPassTest()))
+		cout << "Patch Failed : ReviveBox_ByPassTest" << endl;
+		
+		
 }
+
+ void ReviveBox::UndoPatches()
+ {
+	 bypasstest.UndoPatch();
+	 rtnoption.UndoPatch();
+	 kutext.UndoPatch();
+	 statictxt.UndoPatch();
+	 position.UndoPatch();
+	 dimandtransl.UndoPatch();
+ }
 
  void ReviveBox::CreateReviveBox()
 {
@@ -55,87 +64,70 @@
 	  CreateRezBox(pThis, (uint32_t*)arg_first, arg_second, arg_third);
 }
 
- bool ReviveBox::Patch_ByPassTest(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ bool ReviveBox::Patch_ByPassTest()
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_bypasstest);
-
-	 if (!addr)
+	 if (!bypasstest.GetAddress())
 		 return false;
 
-	 Memory::WriteNop((char*)addr, 13);
+	 bypasstest.WriteByte("90", 13);
 
 	return true;
 }
 
- bool ReviveBox::Patch_ReturnRezMenuOption(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ bool ReviveBox::Patch_ReturnRezMenuOption()
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_rtnmenuoption);
-
-	 if (!addr)
+	 if (!rtnoption.GetAddress())
 		 return false;
 
-	 Memory::WriteNop((char*)addr, 6);
-	
-	 Memory::WriteToMemory((char*)addr, pttrn_patch_rtnmenuoptn);
-	
-	return true;
-}
-
- bool ReviveBox::Patch_KUtext(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
-{
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_KUtext);
-
-	 if (!addr)
-		 return false;
-
-	 Memory::WriteNop((char*)addr, 45);
+	 rtnoption.WriteByte("90", 6);
+	 rtnoption.WriteBytes(pttrn_patch_rtnmenuoptn);
 
 	return true;
 }
 
- bool ReviveBox::Patch_statictxtwindow(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ bool ReviveBox::Patch_KUtext()
 {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_statictxtwindow);
-
-	 if (!addr)
+	 if (!kutext.GetAddress())
 		 return false;
 
-	 Memory::WriteNop((char*)addr, 50);
+	 kutext.WriteByte("90",45);
 
 	return true;
 }
 
- bool ReviveBox::Patch_position(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ bool ReviveBox::Patch_statictxtwindow()
+{
+	 if (!statictxt.GetAddress())
+		 return false;
+
+	 statictxt.WriteByte("90", 50);
+
+	return true;
+}
+
+ bool ReviveBox::Patch_position()
  {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_position);
-
-	 if (!addr)
+	 if (!position.GetAddress())
 		 return false;
 
-	 addr_rtn_position = addr + 5;
+    addr_rtn_position = position.GetAddress().value() + 5;
 
-	 Memory::WriteNop((char*)addr, 5);
-
-	 Memory::WriteJump((char*)addr, (uint32_t)ReviveBox_Pos);
+	position.WriteJump((uint32_t)ReviveBox_Pos);
 
 	 return true;
  }
 
- bool ReviveBox::Patch_DimAndTransl(const std::vector<std::pair<uint32_t, uint32_t>>& ModuleAddresses)
+ bool ReviveBox::Patch_DimAndTransl()
  {
-	 auto addr = Memory::FindPattern(ModuleAddresses, pttrn_dimandtransl);
 
-	 if (!addr)
+	 if (!dimandtransl.GetAddress())
 		 return false;
 
-	 //increase once since its a memory address before where we need to patch
-	 ++addr;
+	 addr_rtn_dimandtransl = dimandtransl.GetAddress().value() + 9;
 
-	 addr_rtn_dimandtransl = addr + 9;
+	 dimandtransl.WriteByte("90", 9);
 
-	 Memory::WriteNop((char*)addr, 9);
-
-	 Memory::WriteJump((char*)addr, (uint32_t)ReviveBox_DimAndTransl);
+	 dimandtransl.WriteJump((uint32_t)ReviveBox_DimAndTransl);
 
 	 return true;
  }

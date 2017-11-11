@@ -13,37 +13,58 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{39afcc38-0456-4ec7-a2b7-6370f59dc170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mods">
+      <UniqueIdentifier>{72a2b349-13bc-4381-9573-c82c59f7545f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MemoryClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Start.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReviveBox.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Pattern.h">
+      <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="LocalCharacter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectInputDefines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AutoInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mods.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="MemoryClass.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="FrameTimer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoInput.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Winsock.h">
-      <Filter>Header Files</Filter>
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectInputDefines.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="WindowsIncludes.h">
-      <Filter>Header Files</Filter>
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalCharacter.h">
+      <Filter>Mods</Filter>
+    </ClInclude>
+    <ClInclude Include="ReviveBox.h">
+      <Filter>Mods</Filter>
+    </ClInclude>
+    <ClInclude Include="MyWindow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DeadLock.h">
+      <Filter>Mods</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Enumeration.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,30 +75,39 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MemoryClass.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Pattern.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameTimer.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Winsock.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="LocalCharacter.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Mods</Filter>
     </ClCompile>
     <ClCompile Include="ReviveBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Mods</Filter>
     </ClCompile>
     <ClCompile Include="AutoInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mods.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="MyWindow.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="FrameTimer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DeadLock.cpp">
+      <Filter>Mods</Filter>
     </ClCompile>
-    <ClCompile Include="Winsock.cpp">
+    <ClCompile Include="Interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="..\ASMBlocks.asm">
-      <Filter>Header Files</Filter>
+      <Filter>Mods</Filter>
     </MASM>
   </ItemGroup>
 </Project>

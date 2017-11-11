@@ -14,7 +14,7 @@
 
  ;variables
  DeadLockTemp dword 0
-
+ LCharaTemp dword 0
 .code
 
 
@@ -35,13 +35,18 @@ LChara_GrabBase proc
 
         push ebx
         mov ebx , [LCharaAddr]
-		mov [ebx], ecx
+		mov [ebx], esi
 		pop ebx
-		mov ax, [ecx + 000001C4h]
-		mov ecx , [LCharaAddr]
 
-;ecx is overwritten right after the jump so we can do this
-		jmp dword ptr[ecx + 04h]
+		fld dword ptr[esi+000002D0h]
+
+		push ecx
+		mov ecx , [LCharaAddr]
+		mov ecx, [ecx + 04h]
+	    mov [LCharaTemp], ecx
+		pop ecx
+	    
+		jmp dword ptr[LCharaTemp]
 
 LChara_GrabBase  endp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -142,7 +147,7 @@ Mod_DeadLock proc
 original:
  
 ;we can't use the functions address directly so put it in a register instead
-     mov [DeadLockTemp], 02B2E290h
+     mov [DeadLockTemp], 02BFD2E0h
      call [DeadLockTemp]
      cmp eax, 53FCh
 	 push ebx

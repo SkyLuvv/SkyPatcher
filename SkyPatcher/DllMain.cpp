@@ -1,5 +1,11 @@
 #include "Start.h"
 #include "Windows.h"
+#include "MyWindow.h"
+#include "Interface.h"
+
+HMODULE theModule;
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow);
 
 BOOLEAN WINAPI  DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -13,7 +19,8 @@ BOOLEAN WINAPI  DllMain(HMODULE hModule,
 		//for better performance reasons
 	    DisableThreadLibraryCalls(hModule);
 
-		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)Sky::main, 0, 0, 0 );
+		theModule = hModule;
+		CreateThread(0, 0, (LPTHREAD_START_ROUTINE)wWinMain, 0, 0, 0 );
 	}
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
@@ -22,3 +29,18 @@ BOOLEAN WINAPI  DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
+
+
+
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+{
+	Sky::main(theModule);
+
+	Interface interface(hInstance);
+	
+	while (interface.ProcessMessage())
+	{
+		
+	}
+}
+

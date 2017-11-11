@@ -3,15 +3,20 @@
 #include <map>
 #include <stdint.h>
 #include "WindowsIncludes.h"
-
+#include <optional>
+#include <Psapi.h>
 
 class Memory
 {
 public:
-	static uint32_t FindPattern(const std::vector<std::pair<uint32_t, uint32_t>>&pages, const std::string & pattern);
-	static std::vector<std::pair<uint32_t, uint32_t>> GetAllModuleAddresses();
-	static void WriteJump(char *SourceAddress, uint32_t  DestAddress, uint32_t nopsize = 5);
-	static uint32_t GetModuleAddress(const std::string & Module);
-	static void WriteToMemory(char *membase, const std::string & bytes);
-	static void WriteNop(char *membase, const size_t & size);
+	static std::optional<uintptr_t> ScanAllPages(const std::vector<std::pair<uintptr_t, size_t>>&pages, const std::string & pattern);
+	static std::optional<uintptr_t> ScanModule(const std::pair<uintptr_t, size_t>&page, const std::string & pattern);
+	static std::optional<std::vector<std::pair<uintptr_t, size_t>>> GetPageAddressesAndSize();
+	static std::optional<MODULEINFO> GetModuleInfo(const std::string & ModuleName);
+	static std::optional<std::pair<uintptr_t, size_t>> GetModuleAddressAndSize(const std::string & ModuleName);
+	static void WriteJump(uint8_t *SourceAddress, uintptr_t  DestAddress, size_t nopsize = 5);
+	static std::optional<uintptr_t> GetModuleAddress(const std::string & Module);
+	static void WriteBytes(uint8_t *membase, const std::string & bytes);
+	static void WriteByte(uint8_t * membase, const size_t & size, const unsigned char byte);
+
 };
