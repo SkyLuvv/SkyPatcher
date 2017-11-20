@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Pattern.h"
 #include "Mod.h"
+
 extern "C"
 {
 	void ReviveBox_Pos();
@@ -13,6 +14,8 @@ extern "C"
 
 class ReviveBox : public Mod
 {
+public:
+	uint32_t datastart;
 private:
 	//keep in mind everything is organized specifically because we access the members by offsets in our assembly code
 	//having them static constexpr lays them out differently in memory. its easier to access them if they're just const
@@ -64,7 +67,7 @@ private:
 public:
 	ReviveBox();
 	virtual void Patch() override;
-	virtual void UndoPatches() override;
+    virtual void UndoPatches() override;
 	void CreateReviveBox();
 };
 

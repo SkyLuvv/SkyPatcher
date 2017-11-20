@@ -1,7 +1,15 @@
-#include "Start.h"
-#include "Windows.h"
-#include "MyWindow.h"
-#include "Interface.h"
+#include "MainWindow.h"
+#include <optional>
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include "Graphics.h"
+#include "Game.h"
+#include "Sky.h"
+
+using namespace std::this_thread;
+using namespace std::chrono;
+
 
 HMODULE theModule;
 
@@ -34,13 +42,27 @@ BOOLEAN WINAPI  DllMain(HMODULE hModule,
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	Sky::main(theModule);
 
-	Interface interface(hInstance);
-	
-	while (interface.ProcessMessage())
+	Sky sky;
+	sky.Main(0);
+
+	MainWindow window(hInstance);
+
+	Graphics gfx(window.GetHWND(), window.Width, window.Height);
+
+	Game game(gfx, window, sky);
+
+	while (window.ProcessMessage())
 	{
-		
+		gfx.BeginScene();
+
+		game.Go();
+
+		gfx.EndScene();
 	}
+
 }
+
+
+
 

@@ -17,8 +17,10 @@ extern  "C"
 
 class LocalChara : public Mod
 {
-private:
 
+public:
+	uint32_t datastart;
+private:
 	//structure layed out specifically so we can access the variables by the required offsets in assembly
 	uint32_t addr_base = 0;
 	uint32_t addr_return = 0;
@@ -30,11 +32,11 @@ public:
 
 	LocalChara();
 	uintptr_t GetBase()const;
-	virtual void Patch() override;
-	virtual void UndoPatches() override;
+	virtual void Patch()override; 
+	virtual void UndoPatches()override;
 	float GetHealth()const;
 	void SetHealth(float newHealth);
-
+	
 private:
 	bool Patch_GetBase();
 

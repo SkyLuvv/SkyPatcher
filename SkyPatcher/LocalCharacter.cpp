@@ -4,6 +4,7 @@ using namespace std::string_literals;
 
 LocalChara::LocalChara()
 	:
+	Mod((uint32_t)modID::LocalChara, (std::string)"LOCALCHARA"),
 	charabase("Client.exe", "D9 86 D0 02 00 00 D9 45 FC DE D9"s)
 {
 	//lets us ignores the null terminator for c-strings in the middle of our string so it gets the length from start to end
@@ -21,11 +22,15 @@ void LocalChara::Patch()
 
 	if (!(Patch_GetBase()))
 		std::cout << "Patched Failed: LocalChara_GetBase" << std::endl;
+
+	patched = true;
 }
 
 void LocalChara::UndoPatches()
 {
 	charabase.UndoPatch();
+
+	patched = false;
 }
 
 float LocalChara::GetHealth()const

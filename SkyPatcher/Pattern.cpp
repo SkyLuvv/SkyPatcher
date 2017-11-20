@@ -83,7 +83,7 @@ void Pattern::UndoPatch()
 	if (originalbytes.empty())
 	    return;
 
-	WriteBytes(originalbytes);
+	Memory::WriteBytes((uint8_t*)baseaddress, originalbytes);
 }
 
 void Pattern::SetAddress(uintptr_t NewAddress)

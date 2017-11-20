@@ -19,30 +19,21 @@
     <Filter Include="Mods">
       <UniqueIdentifier>{72a2b349-13bc-4381-9573-c82c59f7545f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core Memory">
+      <UniqueIdentifier>{06d8eba2-4ba9-4835-8cf2-59cedacb7dfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core Interface">
+      <UniqueIdentifier>{baa133a8-4963-46ad-a006-50e6279eef25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Start.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pattern.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="MemoryClass.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="FrameTimer.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="AutoInput.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Winsock.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DirectInputDefines.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowsIncludes.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="LocalCharacter.h">
@@ -51,39 +42,60 @@
     <ClInclude Include="ReviveBox.h">
       <Filter>Mods</Filter>
     </ClInclude>
-    <ClInclude Include="MyWindow.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DeadLock.h">
       <Filter>Mods</Filter>
-    </ClInclude>
-    <ClInclude Include="Mod.h">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Enumeration.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Interface.h">
-      <Filter>Core</Filter>
+    <ClInclude Include="Sky.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryClass.h">
+      <Filter>Core Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Pattern.h">
+      <Filter>Core Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Mod.h">
+      <Filter>Core Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="DimensionStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectX11Includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Core Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Element2D.h">
+      <Filter>Core Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Core Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Hearts.h">
+      <Filter>Core Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Core Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>Core Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsIncludes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Start.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MemoryClass.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Pattern.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="FrameTimer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Winsock.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="LocalCharacter.cpp">
@@ -95,19 +107,62 @@
     <ClCompile Include="AutoInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MyWindow.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="DeadLock.cpp">
       <Filter>Mods</Filter>
     </ClCompile>
-    <ClCompile Include="Interface.cpp">
+    <ClCompile Include="Sky.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryClass.cpp">
+      <Filter>Core Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Pattern.cpp">
+      <Filter>Core Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Core Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hearts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Core Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Element2D.cpp">
+      <Filter>Core Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Core Interface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="..\ASMBlocks.asm">
       <Filter>Mods</Filter>
     </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="heart1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="heart2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SkyBackGround.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SkyButtonDown.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="SkyButtonUp.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SkyFont.spritefont">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

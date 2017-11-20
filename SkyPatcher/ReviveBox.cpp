@@ -5,6 +5,7 @@ using namespace std::string_literals;
 
  ReviveBox::ReviveBox()
 	 :
+ Mod((uint32_t)modID::ReviveBox, (std::string)"REVIVE MODS"),
  kutext("Client.exe", "6A 00 8B 4D BC 6A"s),
  bypasstest("Client.exe", "E8 95 72 12 FF"s),
  statictxt("Client.exe", "6A 00 6A 00 6A 00 6A 04 68 FF"s),
@@ -45,7 +46,7 @@ using namespace std::string_literals;
 	if (!(Patch_ByPassTest()))
 		cout << "Patch Failed : ReviveBox_ByPassTest" << endl;
 		
-		
+	patched = true;
 }
 
  void ReviveBox::UndoPatches()
@@ -56,6 +57,8 @@ using namespace std::string_literals;
 	 statictxt.UndoPatch();
 	 position.UndoPatch();
 	 dimandtransl.UndoPatch();
+
+	 patched = false;
  }
 
  void ReviveBox::CreateReviveBox()
