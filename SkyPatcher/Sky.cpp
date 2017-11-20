@@ -44,7 +44,7 @@ void Sky::Main(HMODULE hModule)
 	cout << "                         SKY'S PATCHER, ENJOY!\n\n\n";
 
 	cout << "KNOWN BUGS:\n\n";
-	cout<<"1) Upon Normal Death (Not EvG Death) The Revive Menu Won't Show The Original Options. Toggle The Revive Mod Off To Allow Revival From That State.\n\n\n";
+	cout<<"1) Upon Normal Death (Not EvG Death) The Revive Menu Won't Show The Original Options. Toggle The Revive Mod Off To Allow Revival From That State.\n\n\n\n";
 
 
 	for (auto & e : modsmap)
